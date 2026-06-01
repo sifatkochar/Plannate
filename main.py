@@ -11,12 +11,14 @@ print("******************************")
 print("Do you wish to LOGIN / SIGNUP?")
 ls = input()
 
+
 def emoji():
     global img
     global titl
     print(img,img,img,img,img,img,img,img,img)
     print(titl)
     print(img,img,img,img,img,img,img,img,img)
+
 
 def analyze_weaknesses():
     cursor = mydb.cursor()
@@ -55,6 +57,7 @@ def analyze_weaknesses():
         print("Practice and work on your SPEED in MATHS.")
 
     menu()
+
 
 def generate_time_graph():
     global img
@@ -116,6 +119,7 @@ def generate_time_graph():
     plt.show()
 
     menu()
+
 
 def generate_speed_graph():
     global img
@@ -182,7 +186,6 @@ def generate_speed_graph():
     except ZeroDivisionError:
         print('Please enter some RECORDS.')
 
-    
     mask_mixed = np.array([True if value == 0 or value is None else False for value in mixed_speed_values])
     mixed_speed_values = np.ma.masked_array(mixed_speed_values, mask = mask_mixed)
 
@@ -195,7 +198,6 @@ def generate_speed_graph():
     mask_chem = np.array([True if value == 0 or value is None else False for value in chem_speed_values])
     chem_speed_values = np.ma.masked_array(chem_speed_values, mask = mask_chem)
     
-  
     x_axis = np.arange(1, 8, 1)
     plt.plot(x_axis, chem_speed_values, 'o-', color = 'blue', label = 'CHEMISTRY')
     plt.plot(x_axis, physics_speed_values, 'o-', color = 'red', label = 'PHYSICS')
@@ -209,3 +211,11 @@ def generate_speed_graph():
     plt.show()
 
     menu()
+
+
+def update_subject_time(subject, day, study_time):
+    cursor = mydb.cursor()
+
+    update_query = '''UPDATE JEE_TIME SET {} = %s WHERE subject = %s'''.format(day)
+    cursor.execute(update_query, (study_time, subject))
+    mydb.commit()
