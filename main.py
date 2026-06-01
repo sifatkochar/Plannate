@@ -55,3 +55,65 @@ def analyze_weaknesses():
         print("Practice and work on your SPEED in MATHS.")
 
     menu()
+
+def generate_time_graph():
+    global img
+    global titl
+    cursor = mydb.cursor()
+
+    chem_time_query = '''SELECT monday, tuesday, wednesday, thursday, friday, saturday, sunday FROM JEE_TIME WHERE subject = "chemistry"'''
+    cursor.execute(chem_time_query)
+    chemistry_time = cursor.fetchall()
+
+    physics_time_query = '''SELECT monday, tuesday, wednesday, thursday, friday, saturday, sunday FROM JEE_TIME WHERE subject = "physics"'''
+    cursor.execute(physics_time_query)
+    physics_time = cursor.fetchall()
+
+    maths_time_query = '''SELECT monday, tuesday, wednesday, thursday, friday, saturday, sunday FROM JEE_TIME WHERE subject = "maths"'''
+    cursor.execute(maths_time_query)
+    maths_time = cursor.fetchall()
+
+    tdays = ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN']
+    chem_time_values = []
+    physics_time_values = []
+    maths_time_values = []
+
+    for row in chemistry_time:
+        chem_time_values.extend(row)
+    for row in physics_time:
+        physics_time_values.extend(row)
+    for row in maths_time:
+        maths_time_values.extend(row)
+
+    total_time_values = chem_time_values + physics_time_values + maths_time_values
+    avg_total_time = sum(total_time_values) / len(total_time_values)
+
+    if avg_total_time < 7:
+        titl = "You need to IMPROVE your STUDY HOURS!"
+        img = "\U0001F61E"
+        emoji()
+    elif avg_total_time >= 11:
+        titl = "AMAZING WORK! KEEP GOING."
+        img = "\U0001F603"
+        emoji()
+    else:
+        titl = "PERFECT!"
+        img = "\U0001F60A"
+        emoji()
+
+    barWidth = 0.3
+    xc_axis = np.arange(len(chem_time_values))
+    xp_axis = [x+barWidth for x in xc_axis]
+    xm_axis = [x+barWidth for x in xp_axis]
+    plt.bar(xc_axis, chem_time_values, width = barWidth, color = 'green', label = 'CHEMISTRY')
+    plt.bar(xp_axis, physics_time_values, width = barWidth, color = 'blue', label = 'PHYSICS')
+    plt.bar(xm_axis, maths_time_values, width = barWidth, color = 'orange', label = 'MATHS')
+
+    plt.ylabel('TIME')
+    plt.title('TIME GRAPH')
+    plt.xticks([r+barWidth for r in range(len(chem_time_values))], tdays)
+    plt.legend()
+    plt.show()
+
+    menu()
+
