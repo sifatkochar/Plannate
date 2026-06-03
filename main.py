@@ -248,3 +248,47 @@ def update_speed(subject, day_name, speed):
     update_query = '''UPDATE JEE_SPEED SET {} = %s WHERE subject = %s'''.format(day_name)
     cursor.execute(update_query, (speed, subject))
     mydb.commit()
+
+
+def timer():
+    timer_lengths = {20:':20:',30:':30:',1:'1::'}
+    global img
+    global titl
+          
+    print("Which subject are you studying today?")
+    subject = input()
+    today = datetime.datetime.today()
+    day_name = today.strftime("%A")
+
+    print('*******************************************************')
+    print('P.S. - Please MAXIMIZE the timer to avoid distractions!')
+    print('*******************************************************')
+    img = "\U0001F601"
+    titl = "ALL THE BEST!"
+    emoji()
+    start_timer = input('Type "s" to start: ')
+
+    if start_timer == 's':
+        print('Choose timer length (20min, 30min, 1hr) :')
+        min_ask = int(input())
+        
+        if min_ask in timer_lengths:
+            duration = timer_lengths[min_ask]
+            countdown_timer(duration)
+            img = "\U0001F604"
+            titl = "NICE GOING!"
+            emoji()
+            print('How many questions did you get right?')
+            questions_correct = int(input())
+            speed = round((questions_correct / min_ask) * 10, 1)
+            
+            print('Your SPEED :', speed, 'QUES/10-MIN')
+            if subject in ['chemistry', 'maths', 'physics', 'mixed']:
+                update_speed(subject, day_name, speed)
+            else:
+                print("INVALID subject name. Please choose from 'chemistry', 'maths', 'physics' or 'mixed'.")
+
+        else:
+            print("INVALID timer length. Please choose from - 20min, 30min, 1hr.")
+
+        menu()
