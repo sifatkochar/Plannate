@@ -219,3 +219,19 @@ def update_subject_time(subject, day, study_time):
     update_query = '''UPDATE JEE_TIME SET {} = %s WHERE subject = %s'''.format(day)
     cursor.execute(update_query, (study_time, subject))
     mydb.commit()
+
+
+def jee_time():
+    print("Which subject did you study today?")
+    subject = input()
+    print("Please enter the day :")
+    day = input()
+    print("How many hours did you study?")
+    study_time = input()
+
+    if subject in ['chemistry', 'maths', 'physics']:
+        update_subject_time(subject, day, study_time)
+    else:
+        print("INVALID subject name. Please choose from 'chemistry', 'maths' or 'physics'.")
+
+    menu()
