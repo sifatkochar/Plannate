@@ -235,3 +235,16 @@ def jee_time():
         print("INVALID subject name. Please choose from 'chemistry', 'maths' or 'physics'.")
 
     menu()
+
+
+def countdown_timer(duration):
+    Countdown(duration)
+
+
+def update_speed(subject, day_name, speed):
+    global mydb
+    cursor = mydb.cursor()
+    
+    update_query = '''UPDATE JEE_SPEED SET {} = %s WHERE subject = %s'''.format(day_name)
+    cursor.execute(update_query, (speed, subject))
+    mydb.commit()
