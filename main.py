@@ -3,6 +3,10 @@ import numpy as np
 import matplotlib.pyplot as plt
 from oclock import Countdown
 from datetime import date, datetime
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
 
 print("******************************")
 print("----PLANNATE WELCOMES YOU!----")
@@ -510,9 +514,9 @@ if ls == 'signup' or ls == 'SIGNUP':
     user_name = input("Enter your NAME : ")
     global mydb
     mydb = mysql.connector.connect(
-        host = "localhost",
-        user = "root",
-        password = "unpocoloco",
+        host = os.getenv("DB_HOST"),
+        user = os.getenv("DB_USER"),
+        password = os.getenv("DB_PASSWORD"),
     )
     
     def setup_database():
@@ -521,9 +525,9 @@ if ls == 'signup' or ls == 'SIGNUP':
         cursor.execute("CREATE DATABASE {}".format(user_name))
         
         mydb = mysql.connector.connect(
-            host = "localhost",
-            user = "root",
-            password = "unpocoloco",
+            host = os.getenv("DB_HOST"),
+            user = os.getenv("DB_USER"),
+            password = os.getenv("DB_PASSWORD"),
             database = user_name
         )
         
@@ -619,7 +623,11 @@ elif ls == 'login' or ls == 'LOGIN':
     x = input("Enter NAME : ")
     
     # Check if DATABASE EXISTS before CONNECTING
-    temp = mysql.connector.connect(host = "localhost", user = "root", password = "unpocoloco")
+    temp = mysql.connector.connect(
+        host=os.getenv("DB_HOST"),
+        user=os.getenv("DB_USER"),
+        password=os.getenv("DB_PASSWORD"),
+    )
     temp_cursor = temp.cursor()
     temp_cursor.execute("SHOW DATABASES LIKE %s",(x,))
     result=temp_cursor.fetchone()
@@ -629,10 +637,11 @@ elif ls == 'login' or ls == 'LOGIN':
         global mydb
     
         mydb = mysql.connector.connect(
-            host = "localhost",
-            user = "root",
-            password = "unpocoloco",
-            database = x)
+            host = os.getenv("DB_HOST"),
+            user = os.getenv("DB_USER"),
+            password = os.getenv("DB_PASSWORD"),
+            database = x
+        )
         
         if mydb.is_connected():
             cursor = mydb.cursor()
