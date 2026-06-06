@@ -292,3 +292,76 @@ def timer():
             print("INVALID timer length. Please choose from - 20min, 30min, 1hr.")
 
         menu()
+
+
+global flag
+flag = 0
+
+def test_insert():
+    global flag
+    today = datetime.date.today()
+    date = today.strftime('%Y-%m-%d')
+
+    nques = int(input("Enter number of QUESTIONS per SUBJECT = "))
+    p_ques = int(input("Enter POSITIVE marking = "))
+    n_ques = int(input("Enter NEGATIVE marking(-1, etc.) = "))
+
+    if n_ques > 0:
+        print("WRONG INPUT. Please TRY AGAIN!")
+        n_ques = int(input("Enter NEGATIVE marking(-1,etc.)= "))
+
+    c_phy = int(input("Number of CORRECT questions in PHYSICS = "))
+    na_phy = int(input("Number of NON-ATTEMPTED questions in PHYSICS = "))
+    in_phy = nques - c_phy - na_phy
+
+    c_chem = int(input("Number of CORRECT questions in CHEMISTRY = "))
+    na_chem = int(input("Number of NON-ATTEMPTED questions in CHEMISTRY = "))
+    in_chem = nques - c_chem - na_chem
+
+    c_maths = int(input("Number of CORRECT questions in MATHS = "))
+    na_maths = int(input("Number of NON-ATTEMPTED questions in MATHS = "))
+    in_maths = nques - c_maths - na_maths
+
+    ttl_pstv = (c_phy + c_chem + c_maths)*p_ques
+    ttl_ngtv = (in_phy + in_chem + in_maths)*n_ques
+    ttl_mrks = ttl_pstv + ttl_ngtv
+ 
+    ttl_max = nques*3*p_ques
+    prcnt = (ttl_mrks / ttl_max)*100
+    
+    global img
+    global titl
+
+    if prcnt > 80 or prcnt == 80:
+        titl = "AMAZING WORK!"
+        img = "\U0001F603"
+        emoji()
+    elif prcnt < 80 and prcnt > 60:
+        titl = "WOHOO! KEEP GOING!"
+        img = "\U0001F60A"
+        emoji()
+    else:
+        titl = "It’s okay! You will do BETTER next time!"
+        img = "\U0001F61E"
+        emoji()
+
+    cursor = mydb.cursor()
+    insertion = '''INSERT INTO JEE_MARKS
+            (date,nques,c_phy,na_phy,in_phy,c_chem,na_chem,in_chem,
+            c_maths,na_maths,in_maths,prcnt)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)'''
+    
+    data = (date, nques, c_phy, na_phy, in_phy, c_chem, na_chem, in_chem,
+            c_maths, na_maths, in_maths, prcnt)
+
+    cursor.execute(insertion, data)
+    cursor.close()
+    mydb.commit()
+
+    choice = input("WANT TO SEE PIE GRAPHS? (Y/y): ")
+    
+    if choice in 'yY':
+        flag = 1
+        pie_charts()
+    else:
+        menu()
