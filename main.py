@@ -365,3 +365,102 @@ def test_insert():
         pie_charts()
     else:
         menu()
+
+
+def pie_charts():
+    global flag
+
+    if flag == 1:
+        today = datetime.date.today()
+        date = today.strftime('%Y-%m-%d')
+    else:
+        date = input("Enter the DATE for which you want to see the TEST DETAILS ('YYYY-MM-DD'): ")
+
+
+    def retrieve_data(date):
+        cursor = mydb.cursor()
+
+        select_query = '''SELECT c_phy,na_phy,in_phy,
+            c_chem,na_chem,in_chem,c_maths,na_maths,in_maths, nques
+            FROM JEE_marks WHERE date = %s
+            ORDER BY date DESC
+            LIMIT 1'''
+    
+        cursor.execute(select_query, (date,))
+        result = cursor.fetchone()
+
+        if result is not None:
+            phy = [result[0], result[1], result[2]]
+            chem = [result[3], result[4], result[5]]
+            maths = [result[6], result[7], result[8]]
+            ttl_ques = result[9]
+            return phy, chem, maths, ttl_ques
+        else:
+            print('NO DATA found for the given date.')
+            return None, None, None, None
+        
+    phy_data, chem_data, maths_data ,ttl_ques = retrieve_data(date)
+
+
+    def pie_chart(data,sub): 
+        # Create the PIE CHART
+        labels = ['CORRECT QUESTIONS', 'UNATTEMPTED QUESTIONS', 'INCORRECT QUESTIONS']
+        values = [data[0], data[1], data[2]]
+        colors = ['#00FF00', '#FFFF00', '#FF0000']
+
+        non_zero_labels = []
+        non_zero_values = []
+        non_zero_colors = []
+
+        for label, value, color in zip(labels, values, colors):
+            if value != 0:
+                non_zero_labels.append(label)
+                non_zero_values.append(value)
+                non_zero_colors.append(color)
+
+        fig, ax = plt.subplots(figsize=(5, 5))
+        wedges, texts, autotexts = ax.pie(non_zero_values, labels = non_zero_labels, colors = non_zero_colors,
+                                          startangle = 90, autopct = lambda pct: f"{pct * ttl_ques / 100:.0f}")
+        ax.set_title(f"QUESTION DISTRIBUTION on {date}\n{sub}",pad=20)
+        ax.axis('equal')
+        ax.set_xlabel(f"TOTAL QUESTIONS: {ttl_ques}")
+        plt.show()
+
+    if phy_data is not None:
+        pie_chart(phy_data, 'PHYSICS')
+
+    if chem_data is not None:
+        pie_chart(chem_data, 'CHEMISTRY')
+
+    if maths_data is not None:
+        pie_chart(maths_data, 'MATHS')
+
+    mydb.commit()
+    flag = 0
+
+    menu()
+
+
+def line_graph():
+    cursor = mydb.cursor()
+    select_query = "SELECT date, prcnt FROM JEE_marks ORDER BY date ASC LIMIT 5"
+    cursor.execute(select_query)
+    result = cursor.fetchall()
+
+    if len(result) < 5:
+        print("LESS DATA available in the table. Enter MORE to see the graph.")
+
+    else:
+        data_points = [data[0] for data in result]
+        percentages = [data[1] for data in result]
+        fig, ax = plt.subplots(figsize = (8, 6))
+        ax.plot(data_points, percentages)
+        ax.set_xlabel('DATA POINTS')
+        ax.set_ylabel('PERCENTAGE')
+        ax.set_title('LINE GRAPH OF LATEST 5 DATA POINTS')
+
+        plt.show()
+        cursor.close()
+        mydb.commit()
+
+    menu()
