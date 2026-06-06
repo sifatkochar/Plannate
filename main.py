@@ -2,8 +2,7 @@ import mysql.connector
 import numpy as np
 import matplotlib.pyplot as plt
 from oclock import Countdown
-from datetime import datetime
-
+from datetime import date, datetime
 
 print("******************************")
 print("----PLANNATE WELCOMES YOU!----")
@@ -222,17 +221,17 @@ def update_subject_time(subject, day, study_time):
 
 
 def jee_time():
-    print("Which subject did you study today?")
+    print("Which SUBJECT did you study TODAY?")
     subject = input()
-    print("Please enter the day :")
+    print("Please enter the DAY :")
     day = input()
-    print("How many hours did you study?")
+    print("How many HOURS did you STUDY?")
     study_time = input()
 
     if subject in ['chemistry', 'maths', 'physics']:
         update_subject_time(subject, day, study_time)
     else:
-        print("INVALID subject name. Please choose from 'chemistry', 'maths' or 'physics'.")
+        print("INVALID subject name. Please CHOOSE from 'chemistry', 'maths' or 'physics'.")
 
     menu()
 
@@ -255,9 +254,9 @@ def timer():
     global img
     global titl
           
-    print("Which subject are you studying today?")
+    print("Which SUBJECT are you studying TODAY?")
     subject = input()
-    today = datetime.datetime.today()
+    today = datetime.today()
     day_name = today.strftime("%A")
 
     print('*******************************************************')
@@ -269,7 +268,7 @@ def timer():
     start_timer = input('Type "s" to start: ')
 
     if start_timer == 's':
-        print('Choose timer length (20min, 30min, 1hr) :')
+        print('Choose TIMER LENGTH (20min, 30min, 1hr) :')
         min_ask = int(input())
         
         if min_ask in timer_lengths:
@@ -278,7 +277,7 @@ def timer():
             img = "\U0001F604"
             titl = "NICE GOING!"
             emoji()
-            print('How many questions did you get right?')
+            print('How many QUESTIONS did you get RIGHT?')
             questions_correct = int(input())
             speed = round((questions_correct / min_ask) * 10, 1)
             
@@ -297,10 +296,11 @@ def timer():
 global flag
 flag = 0
 
+
 def test_insert():
     global flag
-    today = datetime.date.today()
-    date = today.strftime('%Y-%m-%d')
+    today = date.today()
+    today_date = today.strftime('%Y-%m-%d')
 
     nques = int(input("Enter number of QUESTIONS per SUBJECT = "))
     p_ques = int(input("Enter POSITIVE marking = "))
@@ -351,7 +351,7 @@ def test_insert():
             c_maths,na_maths,in_maths,prcnt)
             VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)'''
     
-    data = (date, nques, c_phy, na_phy, in_phy, c_chem, na_chem, in_chem,
+    data = (today_date, nques, c_phy, na_phy, in_phy, c_chem, na_chem, in_chem,
             c_maths, na_maths, in_maths, prcnt)
 
     cursor.execute(insertion, data)
@@ -371,13 +371,13 @@ def pie_charts():
     global flag
 
     if flag == 1:
-        today = datetime.date.today()
-        date = today.strftime('%Y-%m-%d')
+        today = date.today()
+        req_date = today.strftime('%Y-%m-%d')
     else:
-        date = input("Enter the DATE for which you want to see the TEST DETAILS ('YYYY-MM-DD'): ")
+        req_date = input("Enter the DATE for which you want to see the TEST DETAILS ('YYYY-MM-DD'): ")
 
 
-    def retrieve_data(date):
+    def retrieve_data(req_date):
         cursor = mydb.cursor()
 
         select_query = '''SELECT c_phy,na_phy,in_phy,
@@ -386,7 +386,7 @@ def pie_charts():
             ORDER BY date DESC
             LIMIT 1'''
     
-        cursor.execute(select_query, (date,))
+        cursor.execute(select_query, (req_date,))
         result = cursor.fetchone()
 
         if result is not None:
@@ -399,41 +399,40 @@ def pie_charts():
             print('NO DATA found for the given date.')
             return None, None, None, None
         
-    phy_data, chem_data, maths_data ,ttl_ques = retrieve_data(date)
+    phy_data, chem_data, maths_data ,ttl_ques = retrieve_data(req_date)
 
 
-    def pie_chart(data,sub): 
-        # Create the PIE CHART
-        labels = ['CORRECT QUESTIONS', 'UNATTEMPTED QUESTIONS', 'INCORRECT QUESTIONS']
-        values = [data[0], data[1], data[2]]
+    def pie_charts_combined(phy_data, chem_data, maths_data):
+        labels = ['CORRECT', 'UNATTEMPTED', 'INCORRECT']
         colors = ['#00FF00', '#FFFF00', '#FF0000']
+        subjects = ['PHYSICS', 'CHEMISTRY', 'MATHS']
+        all_data = [phy_data, chem_data, maths_data]
 
-        non_zero_labels = []
-        non_zero_values = []
-        non_zero_colors = []
+        fig, axes = plt.subplots(1, 3, figsize=(15, 5))
+        fig.suptitle(f"QUESTION DISTRIBUTION on {req_date}", fontsize=14)
 
-        for label, value, color in zip(labels, values, colors):
-            if value != 0:
-                non_zero_labels.append(label)
-                non_zero_values.append(value)
-                non_zero_colors.append(color)
+        for ax, data, sub in zip(axes, all_data, subjects):
+            non_zero_labels = []
+            non_zero_values = []
+            non_zero_colors = []
 
-        fig, ax = plt.subplots(figsize=(5, 5))
-        wedges, texts, autotexts = ax.pie(non_zero_values, labels = non_zero_labels, colors = non_zero_colors,
-                                          startangle = 90, autopct = lambda pct: f"{pct * ttl_ques / 100:.0f}")
-        ax.set_title(f"QUESTION DISTRIBUTION on {date}\n{sub}",pad=20)
-        ax.axis('equal')
-        ax.set_xlabel(f"TOTAL QUESTIONS: {ttl_ques}")
+            for label, value, color in zip(labels, data, colors):
+                if value != 0:
+                    non_zero_labels.append(label)
+                    non_zero_values.append(value)
+                    non_zero_colors.append(color)
+
+            ax.pie(non_zero_values, labels=non_zero_labels, colors=non_zero_colors,
+                   startangle=90, autopct=lambda pct: f"{pct * ttl_ques / 100:.0f}")
+            ax.set_title(sub)
+            ax.axis('equal')
+            ax.set_xlabel(f"TOTAL: {ttl_ques}")
+
+        plt.tight_layout()
         plt.show()
 
     if phy_data is not None:
-        pie_chart(phy_data, 'PHYSICS')
-
-    if chem_data is not None:
-        pie_chart(chem_data, 'CHEMISTRY')
-
-    if maths_data is not None:
-        pie_chart(maths_data, 'MATHS')
+        pie_charts_combined(phy_data, chem_data, maths_data)
 
     mydb.commit()
     flag = 0
@@ -513,7 +512,7 @@ if ls == 'signup' or ls == 'SIGNUP':
     mydb = mysql.connector.connect(
         host = "localhost",
         user = "root",
-        password = "",
+        password = "unpocoloco",
     )
     
     def setup_database():
@@ -524,7 +523,7 @@ if ls == 'signup' or ls == 'SIGNUP':
         mydb = mysql.connector.connect(
             host = "localhost",
             user = "root",
-            password = "",
+            password = "unpocoloco",
             database = user_name
         )
         
@@ -620,7 +619,7 @@ elif ls == 'login' or ls == 'LOGIN':
     x = input("Enter NAME : ")
     
     # Check if DATABASE EXISTS before CONNECTING
-    temp = mysql.connector.connect(host = "localhost", user = "root", password = "")
+    temp = mysql.connector.connect(host = "localhost", user = "root", password = "unpocoloco")
     temp_cursor = temp.cursor()
     temp_cursor.execute("SHOW DATABASES LIKE %s",(x,))
     result=temp_cursor.fetchone()
@@ -632,7 +631,7 @@ elif ls == 'login' or ls == 'LOGIN':
         mydb = mysql.connector.connect(
             host = "localhost",
             user = "root",
-            password = "",
+            password = "unpocoloco",
             database = x)
         
         if mydb.is_connected():
