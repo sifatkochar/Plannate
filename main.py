@@ -2,8 +2,8 @@ import mysql.connector
 import numpy as np
 import matplotlib.pyplot as plt
 from oclock import Countdown
-from datetime import date
-from matplotlib import image as mpimg
+from datetime import datetime
+
 
 print("******************************")
 print("----PLANNATE WELCOMES YOU!----")
@@ -464,3 +464,190 @@ def line_graph():
         mydb.commit()
 
     menu()
+
+
+def terminate():
+    print('Bye-Bye!')
+    
+
+def menu():
+
+    print('******************************')
+    print("WOULD YOU LIKE TO :")
+    print('1. Enter TIME spent studying.')
+    print('2. View the TIME CHART.')
+    print('3. Start TIMER.')
+    print('4. View the SPEED GRAPH.')
+    print('5. View WEAK POINTS.')
+    print('6. Enter your TEST DETAILS.')
+    print('7. View TEST DETAIL GRAPH.')
+    print('8. View PIE CHART (ANALYSIS).')
+    print('9. EXIT!')
+    print('******************************')
+        
+    user_action = input('Enter your CHOICE (1-9): ')
+
+    if user_action == '1':
+        jee_time()
+    elif user_action == '2':
+        generate_time_graph()
+    elif user_action == '3':
+        timer()
+    elif user_action == '4':
+        generate_speed_graph()
+    elif user_action == '5':
+        analyze_weaknesses()
+    elif user_action == '6':
+        test_insert()
+    elif user_action == '7':
+        line_graph()
+    elif user_action == '8':
+        pie_charts()
+    elif user_action == '9':
+        terminate()
+
+
+if ls == 'signup' or ls == 'SIGNUP':
+    user_name = input("Enter your NAME : ")
+    global mydb
+    mydb = mysql.connector.connect(
+        host = "localhost",
+        user = "root",
+        password = "",
+    )
+    
+    def setup_database():
+        global mydb
+        cursor = mydb.cursor()
+        cursor.execute("CREATE DATABASE {}".format(user_name))
+        
+        mydb = mysql.connector.connect(
+            host = "localhost",
+            user = "root",
+            password = "",
+            database = user_name
+        )
+        
+        if mydb.is_connected():
+            cursor = mydb.cursor()
+            cursor.execute("SELECT DATABASE();")
+            record = cursor.fetchone()
+            print("-----You are IN. WELCOME!-----")
+        
+        create_jee_time_table_query = """CREATE TABLE JEE_TIME (
+            subject varchar(250),
+            monday int(4) NOT NULL,
+            tuesday int(4) NOT NULL,
+            wednesday int(4) NOT NULL,
+            thursday int(4) NOT NULL,
+            friday int(4) NOT NULL,
+            saturday int(4) NOT NULL,
+            sunday int(4) NOT NULL
+        )"""
+        cursor = mydb.cursor()
+        cursor.execute(create_jee_time_table_query)
+       
+        insert_default_jee_time_query = "INSERT INTO JEE_TIME (subject,monday,tuesday,wednesday,thursday,friday,saturday,sunday) VALUES (%s,%s,%s,%s,%s,%s,%s,%s)"
+        default_time_values = ('chemistry', 0, 0, 0, 0, 0, 0, 0)
+        cursor.execute(insert_default_jee_time_query, default_time_values)
+        mydb.commit()
+
+        insert_default_jee_time_query = "INSERT INTO JEE_TIME (subject,monday,tuesday,wednesday,thursday,friday,saturday,sunday) VALUES (%s,%s,%s,%s,%s,%s,%s,%s)"
+        default_time_values = ('maths', 0, 0, 0, 0, 0, 0, 0)
+        cursor.execute(insert_default_jee_time_query, default_time_values)
+        mydb.commit()
+
+        insert_default_jee_time_query = "INSERT INTO JEE_TIME (subject,monday,tuesday,wednesday,thursday,friday,saturday,sunday) VALUES (%s,%s,%s,%s,%s,%s,%s,%s)"
+        default_time_values = ('physics', 0, 0, 0, 0, 0, 0, 0)
+        cursor.execute(insert_default_jee_time_query, default_time_values)
+        mydb.commit()
+
+        create_jee_speed_table_query = """CREATE TABLE JEE_SPEED (
+            subject varchar(250),
+            monday int(4) NOT NULL,
+            tuesday int(4) NOT NULL,
+            wednesday int(4) NOT NULL,
+            thursday int(4) NOT NULL,
+            friday int(4) NOT NULL,
+            saturday int(4) NOT NULL,
+            sunday int(4) NOT NULL
+        )"""
+        cursor = mydb.cursor()
+        cursor.execute(create_jee_speed_table_query)
+    
+        insert_default_jee_time_query = "INSERT INTO JEE_SPEED (subject,monday,tuesday,wednesday,thursday,friday,saturday,sunday) VALUES (%s,%s,%s,%s,%s,%s,%s,%s)"
+        default_time_values = ('chemistry', 0, 0, 0, 0, 0, 0, 0)
+        cursor.execute(insert_default_jee_time_query, default_time_values)
+        mydb.commit()
+
+        insert_default_jee_time_query = "INSERT INTO JEE_SPEED (subject,monday,tuesday,wednesday,thursday,friday,saturday,sunday) VALUES (%s,%s,%s,%s,%s,%s,%s,%s)"
+        default_time_values = ('maths', 0, 0, 0, 0, 0, 0, 0)
+        cursor.execute(insert_default_jee_time_query, default_time_values)
+        mydb.commit()
+
+        insert_default_jee_time_query = "INSERT INTO JEE_SPEED (subject,monday,tuesday,wednesday,thursday,friday,saturday,sunday) VALUES (%s,%s,%s,%s,%s,%s,%s,%s)"
+        default_time_values = ('physics', 0, 0, 0, 0, 0, 0, 0)
+        cursor.execute(insert_default_jee_time_query, default_time_values)
+        mydb.commit()
+
+        insert_default_jee_time_query = "INSERT INTO JEE_SPEED (subject,monday,tuesday,wednesday,thursday,friday,saturday,sunday) VALUES (%s,%s,%s,%s,%s,%s,%s,%s)"
+        default_time_values = ('mixed', 0, 0, 0, 0, 0, 0, 0)
+        cursor.execute(insert_default_jee_time_query, default_time_values)
+        mydb.commit()
+
+        create_jee_marks_table_query = """CREATE TABLE JEE_MARKS (
+            date DATE,
+            nques INT,
+            c_phy INT,
+            na_phy INT,
+            in_phy INT,
+            c_chem INT,
+            na_chem INT,
+            in_chem INT,
+            c_maths INT,
+            na_maths INT,
+            in_maths INT,
+            prcnt FLOAT
+        )"""
+        cursor = mydb.cursor()
+        cursor.execute(create_jee_marks_table_query)
+        mydb.commit()
+
+    setup_database()
+    menu()
+
+elif ls == 'login' or ls == 'LOGIN':
+    x = input("Enter NAME : ")
+    
+    # Check if DATABASE EXISTS before CONNECTING
+    temp = mysql.connector.connect(host = "localhost", user = "root", password = "")
+    temp_cursor = temp.cursor()
+    temp_cursor.execute("SHOW DATABASES LIKE %s",(x,))
+    result=temp_cursor.fetchone()
+    temp.close()
+    
+    def login():
+        global mydb
+    
+        mydb = mysql.connector.connect(
+            host = "localhost",
+            user = "root",
+            password = "",
+            database = x)
+        
+        if mydb.is_connected():
+            cursor = mydb.cursor()
+            cursor.execute("SELECT DATABASE();")
+            record = cursor.fetchone()
+            print("-----You are IN. WELCOME!-----")
+    
+    if result:
+        login()
+        menu()
+    else:
+        print(f"NO ACCOUNT found for '{x}'. Please SIGNUP.")
+
+else:
+    print("WRONG INPUT. PLEASE TRY AGAIN!")
+
+
